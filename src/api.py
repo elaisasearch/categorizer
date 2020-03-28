@@ -26,8 +26,16 @@ def index() -> str:
     Root api requst url.
     :return: Template
     """
-    return template('index')
-
+    return template("""
+    <html>
+        <body>
+            <h2>Categorizer API</h2>
+            <b>Method:</b> GET <br />
+            <b>URL:</b> https://categorizer.api.elaisa.org/getlanguagelevel?text=your-text <br />
+            <b>RESPONSE:</b> { "result": { "level": "A1","difficulty": "hard", "level_meta": { "unknown": 0, "A1": 64, "A2": 0, "B1": 9, "B2": 0, "C1": 0, "C2": 0 } } }
+        </body>
+    </html>
+    """)
 
 @app.route('/getlanguagelevel', method=["OPTIONS", "GET"])
 def getLanguageLevel() -> dict:
