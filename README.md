@@ -1,4 +1,4 @@
-# Elaisa Search Categorizerr
+# Elaisa Search Categorizer
 
 This repository contains the document categorizer which is used by the Elaisa **Web Crawler** to decide which language level a current scraped document should get. 
 
