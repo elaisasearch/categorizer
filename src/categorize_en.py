@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import json
 import os
+from textblob import TextBlob
+import textacy
 
 
 def categorizeText(input_text: str):
@@ -12,21 +14,19 @@ def categorizeText(input_text: str):
     if (not(isinstance(input_text, str)) or (len(input_text) <= 0)):
         dicti = {"unknown": "NOT OKAY!", "A1": "THIS!", "A2" : "IS!", "B1": "NOT!", "B2": "A!", "C1": "TEXT!", "C2": "NO!"}
         return ["NO!", "NO!", dicti]
+
+    # normalize text with NLP
+    input_text = processText(input_text)
     
     # store words of text lowercase in list
     words: list = [item.lower() for item in input_text.split()]
-    print("text: ", words)
 
     # count frequency of word in text
     word_frequency: dict = getWordFrequency(words)
-    print("dict vocab: ", word_frequency)
 
     # Dataframe, set der Worte mit Sprachniveau
     # word, level
     set_word_table = getWordLevelDataFrameForText(set(words))
-    print(set_word_table)
-
-    # CATEGORIZATION OF LANGUAGE LEVEL
 
     # Betrachtung der Verteilung
     verteilung = {}
@@ -40,8 +40,6 @@ def categorizeText(input_text: str):
         tmp_result = tmp_count/ len(words) * 100
         verteilung[lvl] = round(tmp_result)
         tmp_count = 0
-
-    print("Verteilung: ", verteilung)
     
     #Einstufung anhand des höchsten Levels, das mehr als n verschiedene Wörter enthält
     # sehr unschön bisher!
@@ -133,3 +131,28 @@ def getWordLevelDataFrameForText(text):
     cefr_file.close()
 
     return word_level_table
+
+
+def processText(text):
+
+    preprocessedText = textacy.preprocess_text(
+        text,
+        no_accents=True,
+        no_punct=True,
+        lowercase=False,
+        fix_unicode=True,
+        no_emails=True,
+        no_phone_numbers=True,
+        no_contractions=True
+    )
+
+    # lemmatize the entire text
+    # first, split the text to a list of words
+    words = TextBlob(preprocessedText).words
+    # then, lemmatize each word
+    lemmatizedText = ""
+    for w in words:
+        lemmatizedText += "{} ".format(w.lemmatize())
+
+    # normalize the whitespaces for texts which include s.l. 'Title    And I am ...'
+    return textacy.preprocess.normalize_whitespace(lemmatizedText)
