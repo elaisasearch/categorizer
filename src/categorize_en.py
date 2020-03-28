@@ -71,7 +71,11 @@ def categorizeText(input_text: str):
         difficulty = "easy"
 
     # return Liste [mainLevel, Schwierigkeitsgrad, Sprachniveaus_Verteilung]
-    return [max_level, difficulty, verteilung]
+    return {
+        "level": max_level, 
+        "difficulty": difficulty,
+        "level_meta": verteilung
+    }
 
 
 def getWordFrequency(words: list) -> dict:
