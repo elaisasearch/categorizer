@@ -1,10 +1,11 @@
 """
-The Application Programming Interface (API) for the entire Search Engine.
+The Application Programming Interface (API) for the Elaisa Categorizer.
 """
 
 import json
 from bottle import Bottle, request, response, run, template
 from categorize_en import categorizeText
+from lib.globals import API_KEY
 
 app = Bottle()
 
@@ -42,13 +43,28 @@ def getLanguageLevel() -> dict:
     """
     Takes the user input and returns the found documents as dictionary.
     :text: String
+    :language: String
     :return: Dictionary
     """
     text: str = request.params.get('text')
+    language: str = request.params.get('language')
 
-    return {
-        "result": categorizeText(text)
-    }
+    # check API Key
+    if str(request.params.get('key')) != API_KEY:
+        response.status = 401
+        return {
+            "error": "API-KEY is wrong or missing. See https://github.com/elaisasearch/categorizer/blob/master/README.md for more information."
+        }
+
+    if language == "en":
+        return {
+            "result": categorizeText(text)
+        }
+    # other languages will follow in the future
+    else:
+        return {
+            "error": "'{}' currently isn't supported. Please use 'en' for English as language. Thank you.".format(language) 
+        }
 
 
 app.run(host='0.0.0.0', port=8081, debug=True, reloader=True)
